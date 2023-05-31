@@ -7,13 +7,16 @@
 
 import UIKit
 import SceneKit
+
 class ViewController: UIViewController {
     
     override func loadView() {
-            self.view = SCNView()
+        
+        self.view = SCNView()
     }
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         let scene = SCNScene()
         
@@ -32,10 +35,10 @@ class ViewController: UIViewController {
         let sceneView = self.view as! SCNView
         sceneView.scene = scene
         
-        let star = SCNNode()
-                
-//        sceneView.showsStatistics = true
-//        sceneView.autoenablesDefaultLighting = true
+        _ = SCNNode()
+        
+                sceneView.showsStatistics = true
+                sceneView.autoenablesDefaultLighting = true
         
         sceneView.allowsCameraControl = true
     }
@@ -43,4 +46,39 @@ class ViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
+    
+    @objc func handleTap(_ gestureRecognize: UIGestureRecognizer) {
+               // check what nodes are tapped
+                let p = gestureRecognize.location(in: view)
+                let hitResults = view.hitTest(p, with: [:])
+               
+               // check that we clicked on at least one object
+               if hitResults.count > 0 {
+                   
+                   // retrieved the first clicked object
+                   let result = hitResults[0]
+            
+                   // get material for selected geometry element
+                   let material = result.node.geometry!.materials[(result.geometryIndex)]
+                   
+                   // highlight it
+                   SCNTransaction.begin()
+                   SCNTransaction.animationDuration = 0.5
+                   
+                   // on completion - unhighlight
+                   SCNTransaction.completionBlock = {
+                       SCNTransaction.begin()
+                       SCNTransaction.animationDuration = 0.5
+                       
+                       material.emission.contents = UIColor.black
+                     
+                       SCNTransaction.commit()
+                   }
+                   material.emission.contents = UIColor.green
+                   SCNTransaction.commit()
+               }
+           }
 }
+
+
+
